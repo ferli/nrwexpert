@@ -398,7 +398,8 @@ function renderDMAInterface() {
         <span class="text-muted small">atau</span>
         <label for="csvUpload" class="btn-secondary btn-small" style="cursor: pointer; margin-left: 10px;">📂 Import CSV</label>
         <input type="file" id="csvUpload" accept=".csv" style="display: none;">
-        <p class="text-muted small mt-2">Format: Nama, SIV, Terjual, Pelanggan, Pipa(km)</p>
+        <button class="btn-secondary btn-small" onclick="window.downloadCSVTemplate()" style="margin-left: 10px;">⬇️ Download Template</button>
+        <p class="text-muted small mt-2">Format CSV: Nama, SIV (m³/bln), Terjual (m³/bln), Pelanggan, Pipa (km)</p>
       </div>
     </div>
     
@@ -633,79 +634,113 @@ function clearAllZones() {
 /**
  * Handle CSV Upload
  */
-function handleCSVUpload(file) {
+async function handleCSVUpload(file) {
   if (!file) return;
+
+  // Show loading state
+  const uploadBtn = document.querySelector('label[for="csvUpload"]');
+  const originalText = uploadBtn ? uploadBtn.textContent : '';
+  if (uploadBtn) uploadBtn.textContent = '⏳ Memproses...';
 
   const reader = new FileReader();
   reader.onload = function (e) {
     const text = e.target.result;
     processCSVData(text);
+
+    // Reset button text
+    if (uploadBtn) uploadBtn.textContent = originalText;
   };
+
+  reader.onerror = function () {
+    alert('❌ Error membaca file. Pastikan file adalah CSV yang valid.');
+    if (uploadBtn) uploadBtn.textContent = originalText;
+  };
+
   reader.readAsText(file);
 }
 
 /**
- * Process CSV Data
+ * Process CSV Data with robust parsing
  */
 function processCSVData(csvText) {
-  const lines = csvText.split('\n');
-  let importedCount = 0;
+  // Dynamic import of CSV parser
+  import('./csv-parser.js').then(({ parseZoneCSV }) => {
+    const result = parseZoneCSV(csvText);
 
-  // Skip header row if present (simple check: if first line has 'Nama' or 'Name')
-  let startIndex = 0;
-  if (lines[0].toLowerCase().includes('nama') || lines[0].toLowerCase().includes('name')) {
-    startIndex = 1;
+    if (!result.success) {
+      showImportResultModal(result);
+      return;
+    }
+
+    // Add imported zones to existing zones
+    const beforeCount = zones.length;
+    zones.push(...result.zones);
+    const afterCount = zones.length;
+
+    // Show result modal
+    showImportResultModal(result);
+
+    // Update UI
+    renderDMAInterface();
+    saveDraft();
+
+    // Reset file input
+    const fileInput = document.getElementById('csvUpload');
+    if (fileInput) fileInput.value = '';
+  }).catch(error => {
+    console.error('CSV Parser Error:', error);
+    alert('❌ Error memuat CSV parser. Silakan refresh halaman dan coba lagi.');
+  });
+}
+
+/**
+ * Show import result modal with summary
+ */
+function showImportResultModal(result) {
+  const { success, zones, errors, warnings } = result;
+
+  let message = '';
+
+  if (success) {
+    message = `✅ **Berhasil mengimport ${zones.length} zona!**\n\n`;
+  } else {
+    message = `❌ **Import gagal**\n\n`;
   }
 
-  for (let i = startIndex; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
+  if (errors.length > 0) {
+    message += `**Error:**\n${errors.map(e => `• ${e}`).join('\n')}\n\n`;
+  }
 
-    // Simple comma split (doesn't handle quoted commas, but sufficient for simple data)
-    const cols = line.split(',').map(c => c.trim());
-
-    // Expected format: Name, SIV, Billed, Customers, PipeLength
-    if (cols.length >= 3) {
-      const name = cols[0];
-      const siv = cols[1];
-      const billed = cols[2];
-      const cust = cols[3] || '0';
-      const pipes = cols[4] || '0';
-
-      // Validate numeric
-      if (!isNaN(parseFloat(siv)) && !isNaN(parseFloat(billed))) {
-        zones.push({
-          id: `zone-${Date.now()}-${i}`,
-          name: name,
-          data: {
-            systemInputVolume: siv,
-            billedMetered: billed,
-            numberOfCustomers: cust,
-            pipeLengthKm: pipes,
-            // Defaults
-            averagePressure: '2.5',
-            unbilledMetered: '0',
-            unbilledUnmetered: '0',
-            unauthorizedPct: '3',
-            meterInaccuracyPct: '2'
-          }
-        });
-        importedCount++;
-      }
+  if (warnings.length > 0) {
+    message += `**Peringatan:**\n${warnings.slice(0, 5).map(w => `• ${w}`).join('\n')}`;
+    if (warnings.length > 5) {
+      message += `\n• ... dan ${warnings.length - 5} peringatan lainnya`;
     }
   }
 
-  if (importedCount > 0) {
-    alert(`Berhasil mengimport ${importedCount} zona!`);
-    renderDMAInterface();
-    saveDraft();
-  } else {
-    alert('Gagal mengimport data. Pastikan format CSV: Nama, SIV, Terjual, [Pelanggan], [Pipa]');
-  }
-
-  // Reset file input
-  document.getElementById('csvUpload').value = '';
+  // Use a simple alert for now (could be upgraded to custom modal later)
+  alert(message);
 }
+
+/**
+ * Download CSV template
+ */
+window.downloadCSVTemplate = function () {
+  import('./csv-parser.js').then(({ generateCSVTemplate }) => {
+    const template = generateCSVTemplate();
+    const blob = new Blob([template], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'template_zona_dma.csv');
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+};
 
 /**
  * Calculate DMA results

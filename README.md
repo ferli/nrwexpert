@@ -27,8 +27,8 @@ NRWExpert adalah platform open source **gratis** yang membantu praktisi utilitas
 
 | Fitur | Target | Deskripsi |
 |:------|:------:|:----------|
+| ~~**Better UX**~~ | ✅ **LIVE** | Modal Form Input & Bulk Import CSV (with validation) |
 | **AI NRW Consultant** | Q1 2026 | Chatbot edukasi untuk Q&A tentang NRW |
-| **Better UX** | Q1 2026 | Modal Form Input & Bulk Import (Excel/CSV) |
 | **Learning Modules** | Q2 2026 | Tutorial interaktif metodologi IWA |
 | **Case Study Library** | Q2 2026 | Studi kasus anonymized untuk pembelajaran |
 | **Benchmarking Tool** | Q3 2026 | Perbandingan KPI dengan standar BPPSPAM |

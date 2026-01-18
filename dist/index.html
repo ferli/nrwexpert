@@ -4,18 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Neraca Air IWA | PDAM Standard</title>
-    <meta name="description" content="Alat bantu perhitungan Non-Revenue Water (NRW) standar IWA untuk PDAM Indonesia">
+    <title>NRWExpert - AI-Powered NRW Educational Platform</title>
+    <meta name="description"
+        content="Platform edukasi berbasis AI untuk pembelajaran pengelolaan Non-Revenue Water (NRW) standar IWA - Gratis untuk industri air Indonesia">
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Kalkulator Neraca Air IWA">
-    <meta property="og:description" content="Hitung NRW dan analisa kehilangan air fisik vs komersial secara standar.">
+    <meta property="og:title" content="NRWExpert - AI NRW Educational Platform">
+    <meta property="og:description" content="Belajar pengelolaan NRW dengan AI. Gratis. Open Source. Standar IWA.">
 
     <!-- Icons -->
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💧</text></svg>">
-  <script type="module" crossorigin src="/assets/index-B3hvZAb-.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-Co3cdSr8.css">
+  <script type="module" crossorigin src="/assets/index-BWODTzWT.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-YKqDC0Sm.css">
 <link rel="manifest" href="/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/registerSW.js"></script></head>
 
 <body>
@@ -23,7 +24,7 @@
         <header class="main-header">
             <div class="logo">
                 <span class="icon">💧</span>
-                <h1>Kalkulator Neraca Air IWA</h1>
+                <h1>NRWExpert</h1>
             </div>
             <nav>
                 <a href="#calculator" class="active">Kalkulator</a>
@@ -35,12 +36,12 @@
         <main id="app">
             <!-- Hero Section -->
             <section class="hero">
-                <h2>Hitung NRW, Hasilkan Strategi.</h2>
-                <p>Standar IWA di saku Anda. Analisis Neraca Air dengan presisi tinggi.</p>
+                <h2>Belajar NRW dengan AI. Gratis.</h2>
+                <p>Platform edukasi berbasis AI untuk praktisi utilitas air Indonesia. Standar IWA.</p>
                 <div class="features">
-                    <span>✅ Standar Internasional (IWA)</span>
-                    <span>🔒 Data Aman di Browser Anda</span>
-                    <span>📊 Visualisasi Data Interaktif</span>
+                    <span>🤖 AI-Powered Analysis</span>
+                    <span>🔒 Privacy-First</span>
+                    <span>📊 Standar IWA</span>
                 </div>
             </section>
 
@@ -89,16 +90,66 @@
         </main>
 
         <footer>
-            <p style="margin-bottom: 0.5rem;">&copy; 2026 <a href="https://fdiskandar.com"
-                    style="color: inherit; text-decoration: none; border-bottom: 1px dotted var(--text-muted);">FD
-                    Iskandar</a> | Kalkulator Neraca Air IWA. Gratis untuk Komunitas PDAM.</p>
-            <p style="font-size: 0.8rem; opacity: 0.7; font-style: italic;">
-                Disclaimer: Aplikasi ini adalah inisiatif pribadi (Personal Project) dan tidak mewakili pandangan,
-                kebijakan, atau standar resmi dari instansi manapun.
+            <p style="margin-bottom: 0.5rem;">&copy; 2026 <a href="https://nrwexpert.com"
+                    style="color: inherit; text-decoration: none; border-bottom: 1px dotted var(--text-muted);">NRWExpert</a>
+                | Kalkulator Edukasi Neraca Air IWA</p>
+            <p style="font-size: 0.8rem; opacity: 0.7; font-style: italic; margin-bottom: 0.5rem;">
+                Alat pembelajaran berbasis standar IWA publik. Bukan sistem operasional enterprise.
+            </p>
+            <p style="font-size: 0.75rem; opacity: 0.5;">
+                Pandangan pribadi, bukan afiliasi dengan organisasi manapun. Untuk sistem manajemen NRW enterprise,
+                konsultasikan vendor profesional.
             </p>
         </footer>
     </div>
 
+    <!-- Zone Input Modal -->
+    <div id="zoneModal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📝 Input Data Zona DMA</h3>
+                <button class="btn-close" onclick="window.closeZoneModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nama Zona <span class="required">*</span></label>
+                    <input type="text" id="modalZoneName" placeholder="Contoh: DMA-01 Melati">
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>SIV (m³/bln) <span class="required">*</span></label>
+                        <input type="number" id="modalSIV" placeholder="Input Volume">
+                    </div>
+                    <div class="form-group">
+                        <label>Terjual (m³/bln) <span class="required">*</span></label>
+                        <input type="number" id="modalBilled" placeholder="Volume Rekening">
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Jml Pelanggan</label>
+                        <input type="number" id="modalCustomers" placeholder="Jumlah SR">
+                    </div>
+                    <div class="form-group">
+                        <label>Panjang Pipa (km)</label>
+                        <input type="number" step="0.1" id="modalPipeLength" placeholder="Total KM">
+                    </div>
+                </div>
+
+                <div class="alert alert-info small mt-2">
+                    💡 Data tekanan dan detail lain menggunakan asumsi default untuk analisis cepat. Anda bisa edit
+                    detail nanti.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="window.closeZoneModal()">Batal</button>
+                <button class="btn-primary" onclick="window.saveZoneFromModal()">Simpan Zona</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
