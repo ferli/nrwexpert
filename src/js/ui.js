@@ -394,6 +394,12 @@ function renderDMAInterface() {
       </div>
       
       <button class="btn-secondary btn-large" id="addZoneBtn">+ Tambah Zona DMA</button>
+      <div style="margin-top: 15px; text-align: center;">
+        <span class="text-muted small">atau</span>
+        <label for="csvUpload" class="btn-secondary btn-small" style="cursor: pointer; margin-left: 10px;">📂 Import CSV</label>
+        <input type="file" id="csvUpload" accept=".csv" style="display: none;">
+        <p class="text-muted small mt-2">Format: Nama, SIV, Terjual, Pelanggan, Pipa(km)</p>
+      </div>
     </div>
     
     ${zones.length > 0 ? `
@@ -484,6 +490,14 @@ document.addEventListener('click', (e) => {
   // Export Actions
   else if (target.id === 'exportExcelBtn') {
     alert('Fitur Excel segera hadir!');
+  }
+});
+
+// CSV Upload Listener (Delegated via change event on document body, OR better attached directly when rendered? 
+// Since render is dynamic, document delegation is safer)
+document.addEventListener('change', (e) => {
+  if (e.target.id === 'csvUpload') {
+    handleCSVUpload(e.target.files[0]);
   }
 });
 
@@ -614,6 +628,83 @@ function clearAllZones() {
     setupEventListeners();
     localStorage.removeItem('waterBalanceDraft');
   }
+}
+
+/**
+ * Handle CSV Upload
+ */
+function handleCSVUpload(file) {
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const text = e.target.result;
+    processCSVData(text);
+  };
+  reader.readAsText(file);
+}
+
+/**
+ * Process CSV Data
+ */
+function processCSVData(csvText) {
+  const lines = csvText.split('\n');
+  let importedCount = 0;
+
+  // Skip header row if present (simple check: if first line has 'Nama' or 'Name')
+  let startIndex = 0;
+  if (lines[0].toLowerCase().includes('nama') || lines[0].toLowerCase().includes('name')) {
+    startIndex = 1;
+  }
+
+  for (let i = startIndex; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    // Simple comma split (doesn't handle quoted commas, but sufficient for simple data)
+    const cols = line.split(',').map(c => c.trim());
+
+    // Expected format: Name, SIV, Billed, Customers, PipeLength
+    if (cols.length >= 3) {
+      const name = cols[0];
+      const siv = cols[1];
+      const billed = cols[2];
+      const cust = cols[3] || '0';
+      const pipes = cols[4] || '0';
+
+      // Validate numeric
+      if (!isNaN(parseFloat(siv)) && !isNaN(parseFloat(billed))) {
+        zones.push({
+          id: `zone-${Date.now()}-${i}`,
+          name: name,
+          data: {
+            systemInputVolume: siv,
+            billedMetered: billed,
+            numberOfCustomers: cust,
+            pipeLengthKm: pipes,
+            // Defaults
+            averagePressure: '2.5',
+            unbilledMetered: '0',
+            unbilledUnmetered: '0',
+            unauthorizedPct: '3',
+            meterInaccuracyPct: '2'
+          }
+        });
+        importedCount++;
+      }
+    }
+  }
+
+  if (importedCount > 0) {
+    alert(`Berhasil mengimport ${importedCount} zona!`);
+    renderDMAInterface();
+    saveDraft();
+  } else {
+    alert('Gagal mengimport data. Pastikan format CSV: Nama, SIV, Terjual, [Pelanggan], [Pipa]');
+  }
+
+  // Reset file input
+  document.getElementById('csvUpload').value = '';
 }
 
 /**
