@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Water Balance AI</title>
+    <style>
+        body {
+            font-family: monospace;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #f0f0f0;
+        }
+
+        h1 {
+            color: #4ade80;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .success {
+            border-left: 4px solid #22c55e;
+        }
+
+        .error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .section {
+            margin: 15px 0;
+            padding: 10px;
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .label {
+            color: #60a5fa;
+            font-weight: bold;
+        }
+
+        .value {
+            color: #fbbf24;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔍 Water Balance AI - Debug Console</h1>
+    <p>Test AI response parsing dengan sample data</p>
+
+    <button id="testBtn" onclick="runDebugTest()">Run Debug Test</button>
+    <button onclick="location.reload()">Clear</button>
+
+    <div id="result"></div>
+
+    <script>
+        async function runDebugTest() {
+            const btn = document.getElementById('testBtn');
+            const resultDiv = document.getElementById('result');
+
+            btn.disabled = true;
+            btn.textContent = 'Testing...';
+
+            resultDiv.innerHTML = '<div class="result">Calling debug endpoint...</div>';
+
+            try {
+                const testData = {
+                    mode: 'diagnostic',
+                    systemInputVolume: 1000000,
+                    billedMetered: 700000,
+                    billedUnmetered: 0,
+                    numberOfCustomers: 10000,
+                    pipeLengthKm: 100
+                };
+
+                const response = await fetch('/api/debug-water-balance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+
+                const data = await response.json();
+
+                let html = `<div class="result ${data.success ? 'success' : 'error'}">`;
+                html += `<h2>${data.success ? '✅ SUCCESS' : '❌ FAILED'}</h2>`;
+
+                // Debug Log
+                html += `<div class="section">`;
+                html += `<div class="label">Debug Log:</div>`;
+                html += `<div>Step: ${data.debugLog.step}</div>`;
+                html += `<div>API Status: ${data.debugLog.status} ${data.debugLog.statusText}</div>`;
+                html += `<div>Timestamp: ${data.debugLog.timestamp}</div>`;
+                html += `</div>`;
+
+                // Streaming Info
+                if (data.streaming) {
+                    html += `<div class="section">`;
+                    html += `<div class="label">Streaming:</div>`;
+                    html += `<div>Total Chunks: ${data.streaming.totalChunks}</div>`;
+                    html += `<div>Full Text Length: ${data.streaming.fullTextLength} chars</div>`;
+                    html += `<div class="label">Preview (first 500 chars):</div>`;
+                    html += `<pre>${data.streaming.fullTextPreview}</pre>`;
+                    html += `<div class="label">Last 200 chars:</div>`;
+                    html += `<pre>${data.streaming.fullTextLast200}</pre>`;
+
+                    if (data.streaming.sampleChunks) {
+                        html += `<div class="label">Sample Chunks:</div>`;
+                        data.streaming.sampleChunks.forEach((chunk, i) => {
+                            html += `<div>Chunk ${i}: type=${chunk.type}</div>`;
+                        });
+                    }
+                    html += `</div>`;
+                }
+
+                // Parsing Result
+                if (data.parsing) {
+                    html += `<div class="section">`;
+                    html += `<div class="label">Parsing:</div>`;
+                    html += `<div>Success: ${data.parsing.success}</div>`;
+                    if (data.parsing.error) {
+                        html += `<div class="value">Error: ${data.parsing.error}</div>`;
+                    }
+                    if (data.parsing.parsedJSON) {
+                        html += `<div class="label">Parsed Keys:</div>`;
+                        html += `<div>${data.parsing.parsedJSON.join(', ')}</div>`;
+                    }
+                    html += `</div>`;
+                }
+
+                // Raw Data
+                if (data.raw) {
+                    html += `<div class="section">`;
+                    html += `<div class="label">Raw SSE:</div>`;
+                    html += `<div>Total Lines: ${data.raw.totalLines}</div>`;
+                    html += `<div>First: ${data.raw.firstLine?.substring(0, 100)}...</div>`;
+                    html += `<div>Last: ${data.raw.lastLine?.substring(0, 100)}...</div>`;
+                    html += `</div>`;
+                }
+
+                // Full Response
+                html += `<div class="section">`;
+                html += `<div class="label">Full Debug Response:</div>`;
+                html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                html += `</div>`;
+
+                html += `</div>`;
+                resultDiv.innerHTML = html;
+
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result error">
+                    <h2>❌ ERROR</h2>
+                    <div>${error.message}</div>
+                    <pre>${error.stack}</pre>
+                </div>`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Run Debug Test';
+            }
+        }
+    </script>
+</body>
+
+</html>

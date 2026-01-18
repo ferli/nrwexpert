@@ -1,0 +1,30 @@
+{
+  "name": "water-balance",
+  "version": "1.0.0",
+  "description": "[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT) [![Bahasa](https://img.shields.io/badge/Bahasa-Indonesia-red.svg)]()",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/ui": "^2.1.8",
+    "chart.js": "^4.5.1",
+    "jsdom": "^25.0.1",
+    "underscore": "^1.13.7",
+    "vite": "^7.3.1",
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^2.1.8",
+    "xlsx": "^0.18.5"
+  }
+}
