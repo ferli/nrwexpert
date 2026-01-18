@@ -101,6 +101,53 @@
         </footer>
     </div>
 
+    <!-- Zone Input Modal -->
+    <div id="zoneModal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📝 Input Data Zona DMA</h3>
+                <button class="btn-close" onclick="window.closeZoneModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nama Zona <span class="required">*</span></label>
+                    <input type="text" id="modalZoneName" placeholder="Contoh: DMA-01 Melati">
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>SIV (m³/bln) <span class="required">*</span></label>
+                        <input type="number" id="modalSIV" placeholder="Input Volume">
+                    </div>
+                    <div class="form-group">
+                        <label>Terjual (m³/bln) <span class="required">*</span></label>
+                        <input type="number" id="modalBilled" placeholder="Volume Rekening">
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Jml Pelanggan</label>
+                        <input type="number" id="modalCustomers" placeholder="Jumlah SR">
+                    </div>
+                    <div class="form-group">
+                        <label>Panjang Pipa (km)</label>
+                        <input type="number" step="0.1" id="modalPipeLength" placeholder="Total KM">
+                    </div>
+                </div>
+
+                <div class="alert alert-info small mt-2">
+                    💡 Data tekanan dan detail lain menggunakan asumsi default untuk analisis cepat. Anda bisa edit
+                    detail nanti.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="window.closeZoneModal()">Batal</button>
+                <button class="btn-primary" onclick="window.saveZoneFromModal()">Simpan Zona</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="/src/js/main.js"></script>
 </body>
 

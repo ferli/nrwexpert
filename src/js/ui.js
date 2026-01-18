@@ -497,32 +497,100 @@ document.addEventListener('input', (e) => {
 /**
  * Add new DMA zone
  */
-function addNewZone() {
-  const zoneName = prompt('Nama Zona DMA:', `Zona ${zones.length + 1}`);
-  if (!zoneName) return;
+/**
+ * Modal State
+ */
+let currentEditIndex = -1;
 
-  zones.push({
-    id: `zone-${Date.now()}`,
-    name: zoneName,
-    data: {}
-  });
+/**
+ * Open Modal for Adding
+ */
+function openAddModal() {
+  currentEditIndex = -1;
+  document.getElementById('modalZoneName').value = `DMA-${String(zones.length + 1).padStart(2, '0')}`;
+  document.getElementById('modalSIV').value = '';
+  document.getElementById('modalBilled').value = '';
+  document.getElementById('modalCustomers').value = '';
+  document.getElementById('modalPipeLength').value = '';
 
-  renderDMAInterface();
-  saveDraft();
+  document.getElementById('zoneModal').style.display = 'flex';
+  document.getElementById('modalSIV').focus();
 }
 
 /**
- * Edit zone data
+ * Open Modal for Editing
  */
-function editZone(index) {
-  const zone = zones[index];
+function openEditModal(index) {
+  currentEditIndex = index;
+  const z = zones[index];
 
-  // Create modal/form for zone input
-  showZoneInputForm(zone, (updatedData) => {
-    zones[index].data = updatedData;
-    renderDMAInterface();
-    saveDraft();
-  });
+  document.getElementById('modalZoneName').value = z.name;
+  document.getElementById('modalSIV').value = z.data.systemInputVolume || '';
+  document.getElementById('modalBilled').value = z.data.billedMetered || '';
+  document.getElementById('modalCustomers').value = z.data.numberOfCustomers || '';
+  document.getElementById('modalPipeLength').value = z.data.pipeLengthKm || '';
+
+  document.getElementById('zoneModal').style.display = 'flex';
+}
+
+/**
+ * Window Helpers for Modal
+ */
+window.closeZoneModal = () => {
+  document.getElementById('zoneModal').style.display = 'none';
+};
+
+window.saveZoneFromModal = () => {
+  const name = document.getElementById('modalZoneName').value;
+  const siv = document.getElementById('modalSIV').value;
+  const billed = document.getElementById('modalBilled').value;
+  const cust = document.getElementById('modalCustomers').value;
+  const pipes = document.getElementById('modalPipeLength').value;
+
+  if (!name || !siv || !billed) {
+    alert('Mohon isi Nama Zona, SIV, dan Volume Terjual');
+    return;
+  }
+
+  const zoneData = {
+    systemInputVolume: siv,
+    billedMetered: billed,
+    numberOfCustomers: cust,
+    pipeLengthKm: pipes,
+    // Defaults for quick analysis
+    averagePressure: '2.5',
+    unbilledMetered: '0',
+    unbilledUnmetered: '0',
+    unauthorizedPct: '3',
+    meterInaccuracyPct: '2'
+  };
+
+  if (currentEditIndex === -1) {
+    // ADD NEW
+    zones.push({
+      id: `zone-${Date.now()}`,
+      name: name,
+      data: zoneData
+    });
+  } else {
+    // UPDATE EXISTING
+    zones[currentEditIndex].name = name;
+    zones[currentEditIndex].data = zoneData;
+  }
+
+  renderDMAInterface();
+  saveDraft();
+  window.closeZoneModal();
+};
+
+// -- Modified addNewZone to use Modal --
+function addNewZone() {
+  openAddModal();
+}
+
+// -- Modified editZone to use Modal --
+function editZone(index) {
+  openEditModal(index);
 }
 
 /**
@@ -545,24 +613,6 @@ function clearAllZones() {
     renderDMAInterface();
     setupEventListeners();
     localStorage.removeItem('waterBalanceDraft');
-  }
-}
-
-/**
- * Show zone input form (simplified - reuse PDAM form logic)
- */
-function showZoneInputForm(zone, onSave) {
-  // For now, use a simple series of prompts
-  // TODO: Create a proper modal form
-
-  const data = {};
-  data.systemInputVolume = prompt('SIV (m³):', zone.data.systemInputVolume || '');
-  data.billedMetered = prompt('Billed Metered (m³):', zone.data.billedMetered || '');
-  data.numberOfCustomers = prompt('Jumlah Pelanggan:', zone.data.numberOfCustomers || '');
-  data.pipeLengthKm = prompt('Panjang Pipa (km):', zone.data.pipeLengthKm || '');
-
-  if (data.systemInputVolume && data.billedMetered) {
-    onSave(data);
   }
 }
 
