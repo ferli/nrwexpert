@@ -9,12 +9,19 @@
 
 NRWExpert adalah platform open source untuk membantu praktisi utilitas air menganalisis Non-Revenue Water (NRW) menggunakan standar IWA (International Water Association).
 
-**Fitur Utama:**
-- 📊 Kalkulator Neraca Air (IWA Standard)
-- 🤖 AI-Powered Analysis (Gemini)
-- 📄 Export PDF (Technical Report, Diagnostic, Proposal)
-- 🏘️ Multi-Zone DMA Support
-- 🔒 Privacy-First (100% browser-based)
+## 📊 Fitur Utama
+
+| Fitur | Status | Deskripsi |
+|:------|:------:|:----------|
+| **IWA Water Balance Calculator** | ✅ Live | Kalkulator neraca air standar IWA |
+| **NRW Loss Estimator** | ✅ Live | Estimasi nilai kerugian finansial NRW |
+| **AI-Powered Analysis** | ✅ Live | Diagnostic & investment proposal (Gemini) |
+| **PDF Export** | ✅ Live | Technical report, diagnostic, proposal |
+| **Multi-Zone DMA** | ✅ Live | District Metered Area aggregation |
+| **DMA Profiling** | 🔄 Roadmap | Read-only profiling per zona |
+| **Anomaly Detection** | 🔄 Roadmap | Deteksi anomali dari data meter |
+
+**Privacy-First:** 100% browser-based, tidak ada data dikirim ke server.
 
 ## 🚀 Quick Start
 
